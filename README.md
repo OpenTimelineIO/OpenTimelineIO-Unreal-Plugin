@@ -58,7 +58,7 @@ For unsupported features, contributions are welcome.
 
 ## Install
 
-This plugin requires that the Python packages referenced in `requirements.txt`
+This plugin requires that the Python packages referenced in [requirements.txt](requirements.txt)
 are installed to a location on the `UE_PYTHONPATH` environment variable. See 
 the [Scripting the Unreal Editor Using Python](https://docs.unrealengine.com/5.0/en-US/scripting-the-unreal-editor-using-python/) 
 docs for more info.
