@@ -169,6 +169,9 @@ once) or a granular level (updating each stack and clip in-place).
 See the [OTIO documentation](https://opentimelineio.readthedocs.io/en/latest/tutorials/write-a-hookscript.html)
 for instructions on adding hooks to the OTIO environment.
 
+An example OTIO plugin manifest file and UE-specific hooks can be found in 
+[examples/hooks](examples/hooks).
+
 **NOTE**
 
 All OTIO hook functions must have the following signature and parameter names,
