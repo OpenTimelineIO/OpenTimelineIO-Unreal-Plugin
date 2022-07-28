@@ -1,0 +1,16 @@
+{
+	"FileVersion": 3,
+	"Version": 0.1,
+	"VersionName": "0.1",
+	"FriendlyName": "OpenTimelineIO (OTIO) Utilities",
+	"Description": "Utilities for integrating OpenTimelineIO into linear content pipelines.",
+	"Category": "Scripting",
+	"CreatedBy": "Contributors to the OpenTimelineIO project",
+	"CreatedByURL": "https://github.com/OpenTimelineIO/OpenTimelineIO-Unreal-Plugin",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"Installed": false
+}
