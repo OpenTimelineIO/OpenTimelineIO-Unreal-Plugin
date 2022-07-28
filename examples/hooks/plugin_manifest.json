@@ -1,0 +1,21 @@
+{
+    "OTIO_SCHEMA" : "PluginManifest.1",
+    "hook_scripts" : [
+        {
+            "OTIO_SCHEMA" : "HookScript.1",
+            "name" : "otio_to_ue",
+            "execution_scope" : "in process",
+            "filepath" : "otio_to_ue.py"
+        },
+		{
+            "OTIO_SCHEMA" : "HookScript.1",
+            "name" : "ue_to_otio",
+            "execution_scope" : "in process",
+            "filepath" : "ue_to_otio.py"
+        }
+    ],
+    "hooks" : {
+        "otio_ue_pre_import_item" : ["otio_to_ue"],
+        "otio_ue_post_export_clip" : ["ue_to_otio"]
+    }
+}
