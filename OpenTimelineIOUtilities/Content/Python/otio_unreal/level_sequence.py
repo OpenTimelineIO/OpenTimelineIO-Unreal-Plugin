@@ -525,9 +525,8 @@ class LevelSequenceProxy(object):
                         continue
 
                     # Clip or Stack: Update or create section
-                    try:
-                        sub_seq_path = get_sub_sequence_path(item)
-                    except KeyError:
+                    sub_seq_path = get_sub_sequence_path(item)
+                    if not sub_seq_path:
                         continue
 
                     if (
