@@ -52,7 +52,7 @@ def get_level_seq_references(timeline, level_seq=None):
 
     level_seq_refs = [(root_level_seq_path, timeline)]
 
-    for item in timeline.children_if():
+    for item in timeline.find_children():
         if not isinstance(item, (otio.schema.Stack, otio.schema.Clip)):
             continue
 

@@ -427,7 +427,7 @@ class OTIOUnrealIOTest(unittest.TestCase):
         out_timeline.tracks.metadata.clear()
         set_sub_sequence_path(out_timeline.tracks, root_level_seq_path)
 
-        for item in out_timeline.children_if():
+        for item in out_timeline.find_children():
             level_seq_path = get_sub_sequence_path(item)
             if level_seq_path is not None:
 

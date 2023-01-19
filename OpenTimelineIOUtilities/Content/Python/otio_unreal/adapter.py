@@ -64,7 +64,7 @@ def import_otio(
     # items (stacks and clips) to sub-sequences.
     run_pre_import_otio_item_hook(timeline.tracks)
 
-    for item in timeline.children_if():
+    for item in timeline.find_children():
         if isinstance(item, (otio.schema.Stack, otio.schema.Clip)):
             run_pre_import_otio_item_hook(item)
 
@@ -127,7 +127,7 @@ def export_otio(filepath, level_seq, dry_run=False):
     # map unreal metadata to rendered outputs.
     timeline = run_post_export_otio_hook(timeline)
 
-    for clip in timeline.clip_if():
+    for clip in timeline.find_clip():
         # Implementation-defined clip update to inject a media reference
         # that maps unreal metadata to a rendered output.
         run_post_export_otio_clip_hook(clip)

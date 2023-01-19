@@ -509,7 +509,7 @@ class LevelSequenceProxy(object):
             # Video tracks are stacked in reverse in a timeline, with the lowest
             # index at the bottom.
             for row_index, track in enumerate(reversed(parent_stack)):
-                if track.kind != otio.schema.track.TrackKind.Video:
+                if track.kind != otio.schema.TrackKind.Video:
                     continue
 
                 # Name track if possible
