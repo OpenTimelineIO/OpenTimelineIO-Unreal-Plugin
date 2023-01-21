@@ -91,15 +91,49 @@ class LevelSequenceProxy(object):
 
         return float(display_rate.numerator) / float(display_rate.denominator)
 
+    def get_nearest_rate(self, frame_rate):
+        """Convert a float frame rate to an exact fraction
+        Args:
+            frame_rate (float): Frames per second
+        """
+        # rates are from the sequencer display rate menu
+        rates = ((12,       1),
+                 (15,       1),
+                 (24000, 1001),
+                 (24,       1),
+                 (25,       1),
+                 (30000, 1001),
+                 (30,       1),
+                 (48,       1),
+                 (60000, 1001),
+                 (50,       1),
+                 (60,       1),
+                 (100,      1),
+                 (120,      1),
+                 (240,      1))
+
+        nearest = None
+        min_diff = float('inf')
+        for i, (num, den) in enumerate(rates):
+            valid_rate = float(num)/float(den)
+            if frame_rate == valid_rate:
+                return unreal.FrameRate(numerator=num, denominator=den)
+
+            diff = abs(frame_rate - valid_rate)
+            if (diff >= min_diff):
+                continue
+            min_diff = diff
+            nearest = [num, den]
+
+        return unreal.FrameRate(numerator=nearest[0], denominator=nearest[1])
+
     def set_frame_rate(self, frame_rate):
         """Set frame rate (frames per second).
 
         Args:
             frame_rate (float): Frames per second
         """
-        self.level_seq.set_display_rate(
-            unreal.FrameRate(numerator=frame_rate, denominator=1)
-        )
+        self.level_seq.set_display_rate(self.get_nearest_rate(frame_rate))
 
     def get_ticks_per_frame(self):
         """Calculate ticks per frame.
