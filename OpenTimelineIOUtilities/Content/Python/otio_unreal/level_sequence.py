@@ -573,9 +573,14 @@ class LevelSequenceProxy(object):
                         sub_seq = section.get_sequence()
                     else:
                         sub_seq = load_or_create_level_seq(sub_seq_path)
+                        if not sub_seq:
+                            continue
 
                         section = shot_track.add_section()
                         section.set_sequence(sub_seq)
+
+                    if not sub_seq:
+                        continue
 
                     section_proxy = ShotSectionProxy(section, self)
                     sub_seq_proxy = LevelSequenceProxy(sub_seq, section_proxy)
