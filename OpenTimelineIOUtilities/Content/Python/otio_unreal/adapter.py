@@ -127,7 +127,7 @@ def export_otio(filepath, level_seq, dry_run=False):
     # map unreal metadata to rendered outputs.
     timeline = run_post_export_otio_hook(timeline)
 
-    for clip in timeline.find_clip():
+    for clip in timeline.find_clips():
         # Implementation-defined clip update to inject a media reference
         # that maps unreal metadata to a rendered output.
         run_post_export_otio_clip_hook(clip)
