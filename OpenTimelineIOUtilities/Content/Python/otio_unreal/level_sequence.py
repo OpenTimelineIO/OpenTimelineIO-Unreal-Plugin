@@ -47,10 +47,12 @@ class LevelSequenceProxy(object):
         is_read_only = self.level_seq.is_read_only()
         self.level_seq.set_read_only(False)
 
+        section_status = []
         # Unlock shot tracks
         shot_track = self.get_shot_track()
         if shot_track is not None:
             for section in shot_track.get_sections():
+                section_status.append(section.is_locked())
                 section.set_is_locked(False)
 
         yield
@@ -58,8 +60,8 @@ class LevelSequenceProxy(object):
         # Lock all shot tracks
         shot_track = self.get_shot_track()
         if shot_track is not None:
-            for section in shot_track.get_sections():
-                section.set_is_locked(True)
+            for section, lock_state in zip(shot_track.get_sections(), section_status):
+                section.set_is_locked(lock_state)
 
         # Restore level sequence read-only state
         self.level_seq.set_read_only(is_read_only)
