@@ -316,7 +316,7 @@ class LevelSequenceProxy(object):
         if parent_item.markers:
             parent_item.markers.clear()
 
-        for frame_marker in self.level_seq.get_marked_frames():
+        for frame_marker in self.level_seq.get_marked_frames_from_sequence():
             # Convert from frame number at tick resolution
             frame = frame_marker.frame_number.value // self.get_ticks_per_frame()
             marked_range = TimeRange(
