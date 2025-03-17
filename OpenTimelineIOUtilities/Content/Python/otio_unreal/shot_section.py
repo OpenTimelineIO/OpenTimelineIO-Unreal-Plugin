@@ -52,7 +52,10 @@ class ShotSectionProxy(object):
         Returns:
             float: Time scalar
         """
-        return self.section.parameters.time_scale
+        time_scale = self.section.parameters.time_scale
+        if hasattr(unreal, 'MovieSceneTimeWarpVariant'):  # UE 5.5+
+            time_scale = time_scale.to_fixed_play_rate()
+        return time_scale
 
     def set_time_scale(self, time_scale):
         """Set this section's time scale, which scales the playback
@@ -61,6 +64,9 @@ class ShotSectionProxy(object):
         Args:
             time_scale (float): Time scale value
         """
+        if hasattr(unreal, 'MovieSceneTimeWarpVariant'):
+            time_scale = unreal.MovieSceneTimeWarpVariant(time_scale)
+
         self.section.parameters.time_scale = time_scale
 
     def get_range_in_parent(self):
