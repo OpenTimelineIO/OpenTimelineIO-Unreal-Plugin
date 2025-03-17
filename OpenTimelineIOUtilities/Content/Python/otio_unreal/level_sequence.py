@@ -413,7 +413,7 @@ class LevelSequenceProxy(object):
         multi_track = len(row_sections) > 1
 
         for row_idx, sections in sorted(row_sections.items()):
-            video_track = otio.schema.Track(kind=otio.schema.track.TrackKind.Video)
+            video_track = otio.schema.Track(kind=otio.schema.Track.Kind.Video)
 
             # Name track if possible
             if not multi_track:
