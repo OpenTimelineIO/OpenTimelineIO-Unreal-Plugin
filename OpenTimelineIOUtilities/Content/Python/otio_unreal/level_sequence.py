@@ -73,7 +73,7 @@ class LevelSequenceProxy(object):
             unreal.MovieSceneCinematicShotTrack: Shot track, if found,
                 otherwise None.
         """
-        shot_tracks = self.level_seq.find_master_tracks_by_exact_type(
+        shot_tracks = self.level_seq.find_tracks_by_exact_type(
             unreal.MovieSceneCinematicShotTrack
         )
         if shot_tracks:
@@ -523,7 +523,7 @@ class LevelSequenceProxy(object):
             shot_track = self.get_shot_track()
 
             if shot_track is None:
-                shot_track = self.level_seq.add_master_track(
+                shot_track = self.level_seq.add_track(
                     unreal.MovieSceneCinematicShotTrack
                 )
 
