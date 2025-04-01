@@ -47,10 +47,12 @@ class LevelSequenceProxy(object):
         is_read_only = self.level_seq.is_read_only()
         self.level_seq.set_read_only(False)
 
+        section_status = []
         # Unlock shot tracks
         shot_track = self.get_shot_track()
         if shot_track is not None:
             for section in shot_track.get_sections():
+                section_status.append(section.is_locked())
                 section.set_is_locked(False)
 
         yield
@@ -58,8 +60,8 @@ class LevelSequenceProxy(object):
         # Lock all shot tracks
         shot_track = self.get_shot_track()
         if shot_track is not None:
-            for section in shot_track.get_sections():
-                section.set_is_locked(True)
+            for section, lock_state in zip(shot_track.get_sections(), section_status):
+                section.set_is_locked(lock_state)
 
         # Restore level sequence read-only state
         self.level_seq.set_read_only(is_read_only)
@@ -73,7 +75,7 @@ class LevelSequenceProxy(object):
             unreal.MovieSceneCinematicShotTrack: Shot track, if found,
                 otherwise None.
         """
-        shot_tracks = self.level_seq.find_master_tracks_by_exact_type(
+        shot_tracks = self.level_seq.find_tracks_by_exact_type(
             unreal.MovieSceneCinematicShotTrack
         )
         if shot_tracks:
@@ -91,15 +93,49 @@ class LevelSequenceProxy(object):
 
         return float(display_rate.numerator) / float(display_rate.denominator)
 
+    def get_nearest_rate(self, frame_rate):
+        """Convert a float frame rate to an exact fraction
+        Args:
+            frame_rate (float): Frames per second
+        """
+        # rates are from the sequencer display rate menu
+        rates = ((12,       1),
+                 (15,       1),
+                 (24000, 1001),
+                 (24,       1),
+                 (25,       1),
+                 (30000, 1001),
+                 (30,       1),
+                 (48,       1),
+                 (60000, 1001),
+                 (50,       1),
+                 (60,       1),
+                 (100,      1),
+                 (120,      1),
+                 (240,      1))
+
+        nearest = None
+        min_diff = float('inf')
+        for i, (num, den) in enumerate(rates):
+            valid_rate = float(num)/float(den)
+            if frame_rate == valid_rate:
+                return unreal.FrameRate(numerator=num, denominator=den)
+
+            diff = abs(frame_rate - valid_rate)
+            if (diff >= min_diff):
+                continue
+            min_diff = diff
+            nearest = [num, den]
+
+        return unreal.FrameRate(numerator=nearest[0], denominator=nearest[1])
+
     def set_frame_rate(self, frame_rate):
         """Set frame rate (frames per second).
 
         Args:
             frame_rate (float): Frames per second
         """
-        self.level_seq.set_display_rate(
-            unreal.FrameRate(numerator=frame_rate, denominator=1)
-        )
+        self.level_seq.set_display_rate(self.get_nearest_rate(frame_rate))
 
     def get_ticks_per_frame(self):
         """Calculate ticks per frame.
@@ -280,7 +316,7 @@ class LevelSequenceProxy(object):
         if parent_item.markers:
             parent_item.markers.clear()
 
-        for frame_marker in self.level_seq.get_marked_frames():
+        for frame_marker in self.level_seq.get_marked_frames_from_sequence():
             # Convert from frame number at tick resolution
             frame = frame_marker.frame_number.value // self.get_ticks_per_frame()
             marked_range = TimeRange(
@@ -377,7 +413,7 @@ class LevelSequenceProxy(object):
         multi_track = len(row_sections) > 1
 
         for row_idx, sections in sorted(row_sections.items()):
-            video_track = otio.schema.Track(kind=otio.schema.track.TrackKind.Video)
+            video_track = otio.schema.Track(kind=otio.schema.Track.Kind.Video)
 
             # Name track if possible
             if not multi_track:
@@ -489,7 +525,7 @@ class LevelSequenceProxy(object):
             shot_track = self.get_shot_track()
 
             if shot_track is None:
-                shot_track = self.level_seq.add_master_track(
+                shot_track = self.level_seq.add_track(
                     unreal.MovieSceneCinematicShotTrack
                 )
 
@@ -509,7 +545,7 @@ class LevelSequenceProxy(object):
             # Video tracks are stacked in reverse in a timeline, with the lowest
             # index at the bottom.
             for row_index, track in enumerate(reversed(parent_stack)):
-                if track.kind != otio.schema.track.TrackKind.Video:
+                if track.kind != otio.schema.TrackKind.Video:
                     continue
 
                 # Name track if possible
@@ -525,9 +561,8 @@ class LevelSequenceProxy(object):
                         continue
 
                     # Clip or Stack: Update or create section
-                    try:
-                        sub_seq_path = get_sub_sequence_path(item)
-                    except KeyError:
+                    sub_seq_path = get_sub_sequence_path(item)
+                    if not sub_seq_path:
                         continue
 
                     if (
@@ -540,9 +575,14 @@ class LevelSequenceProxy(object):
                         sub_seq = section.get_sequence()
                     else:
                         sub_seq = load_or_create_level_seq(sub_seq_path)
+                        if not sub_seq:
+                            continue
 
                         section = shot_track.add_section()
                         section.set_sequence(sub_seq)
+
+                    if not sub_seq:
+                        continue
 
                     section_proxy = ShotSectionProxy(section, self)
                     sub_seq_proxy = LevelSequenceProxy(sub_seq, section_proxy)
