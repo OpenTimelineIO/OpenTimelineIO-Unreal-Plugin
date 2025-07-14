@@ -135,6 +135,9 @@ class LevelSequenceProxy(object):
         Args:
             frame_rate (float): Frames per second
         """
+        # Don't set frame rate if it matches the current one
+        if self.get_frame_rate() == frame_rate:
+            return
         self.level_seq.set_display_rate(self.get_nearest_rate(frame_rate))
 
     def get_ticks_per_frame(self):
